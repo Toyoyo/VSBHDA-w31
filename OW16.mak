@@ -70,7 +70,8 @@ OBJFILES = &
 	$(OUTD)/hapi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/dpmi.obj		$(OUTD)/uninst.obj &
 	$(OUTD)/sbrk.obj		$(OUTD)/malloc.obj		$(OUTD)/rte200.obj		$(OUTD)/au_cards.obj &
 	$(OUTD)/fileacc.obj		$(OUTD)/logfile.obj		$(OUTD)/getenv.obj		$(OUTD)/strtol.obj		$(OUTD)/_matherr.obj &
-	$(OUTD)/dpmiisr.obj		$(OUTD)/loaddrv.obj
+	$(OUTD)/dpmiisr.obj		$(OUTD)/loaddrv.obj &
+	$(OUTD)/cdaudio.obj
 
 C_OPT_FLAGS=-q -oxa -ms -ecc -5s -fp5 -fpi87 -wcd=111
 # OW's wpp386 doesn't like the -ecc option ("function modifier cannot be used ...")
@@ -142,6 +143,7 @@ $(OUTD)/vdma.obj:      src\vdma.c
 $(OUTD)/virq.obj:      src\virq.c
 $(OUTD)/vmpu.obj:      src\vmpu.c
 $(OUTD)/vsb.obj:       src\vsb.c
+$(OUTD)/cdaudio.obj: src\cdaudio.c
 !ifndef NOFM
 $(OUTD)/dbopl.obj:     src\dbopl.cpp
 

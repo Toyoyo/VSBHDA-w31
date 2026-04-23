@@ -83,7 +83,8 @@ OBJFILES = \
 	$(OUTD)/STACKIO.obj		$(OUTD)/STACKISR.obj	$(OUTD)/SBISR.obj		$(OUTD)/INT31.obj		$(OUTD)/RMWRAP.obj		$(OUTD)/MIXER.obj \
 	$(OUTD)/HAPI.obj		$(OUTD)/DPRINTF.obj		$(OUTD)/VIOOUT.obj		$(OUTD)/DPMI.obj		$(OUTD)/UNINST.obj		$(OUTD)/GETENV.obj \
 	$(OUTD)/MALLOC.obj		$(OUTD)/SBRK.obj		$(OUTD)/FILEACC.obj		$(OUTD)/LOGFILE.obj		$(OUTD)/STRTOL.obj		$(OUTD)/_MATHERR.obj \
-	$(OUTD)/DPMIISR.obj
+	$(OUTD)/DPMIISR.obj \
+	$(OUTD)/CDAUDIO.obj
 
 ifeq ($(DYNAMIC),0)
 OBJFILES += \

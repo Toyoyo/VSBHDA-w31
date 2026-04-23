@@ -63,7 +63,8 @@ OBJFILES = \
 	$(OUTD)/HAPI.obj		$(OUTD)/DPRINTF.obj		$(OUTD)/VIOOUT.obj		$(OUTD)/DPMI.obj		$(OUTD)/UNINST.obj \
 	$(OUTD)/SBRK.obj		$(OUTD)/MALLOC.obj		$(OUTD)/RTE200.obj		$(OUTD)/AU_CARDS.obj \
 	$(OUTD)/FILEACC.obj		$(OUTD)/LOGFILE.obj		$(OUTD)/GETENV.obj		$(OUTD)/STRTOL.obj		$(OUTD)/_MATHERR.obj \
-	$(OUTD)/DPMIISR.obj		$(OUTD)/LOADDRV.obj
+	$(OUTD)/DPMIISR.obj		$(OUTD)/LOADDRV.obj \
+	$(OUTD)/CDAUDIO.obj
 
 C_OPT_FLAGS=-q -oxa -ms -ecc -5s -fp5 -fpi87 -wcd=111
 # OW's wpp386 doesn't like the -ecc option ("function modifier cannot be used ...")
