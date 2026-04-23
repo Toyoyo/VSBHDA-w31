@@ -16,6 +16,7 @@
 #define SOUNDFONT 1   /* 1=support soundfonts if VMPU is on */
 #define PT0V86    1   /* 1=support read access to v86 page table 0 */
 #define HOSTRT    0   /* 0=protect SB irq, so it's not modified by programs; must match setting in SBISR.ASM */
+#define CDAUDIOENABLED	1	/* 1=support CD digital audio via modified SHSUCDX */
 
 #define HW_CHANNELS 2
 #define HW_BITS 16
@@ -57,6 +58,8 @@ struct globalvars {
 	int pin;
 	int device;
 	int period_size;
+	int cda;
+        int cdvol;
 #ifdef _DEBUG
 	char *logfile;
 #endif
