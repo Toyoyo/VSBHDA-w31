@@ -103,7 +103,10 @@
    (WIN311IMG=hard disk image with Windows installed); test/dos/SBPLAY.ASM
    plays a tone with the SB DMA in a DOS box, test/win/PLAYWAV.C plays WAV
    files with sndPlaySound, test/win/MIDITEST.C plays notes on the MIDI
-   device and MIDI files with MCI (MIDI Mapper). The sound output of QEMU is
+   device and MIDI files with MCI (MIDI Mapper); make -C test/win builds
+   them and the test sounds (test/win/mksounds.py). test/install.sh tests
+   the setup package (install/mkpkg.sh): setup, DOS and Windows sound,
+   INSTALL /U. The sound output of QEMU is
    recorded as a WAV file.
 
 

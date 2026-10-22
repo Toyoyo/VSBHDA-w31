@@ -13,7 +13,7 @@
 #   WIN311IMG  hard disk image with WfW 3.11 in C:\WINDOWS (required)
 #   MM         memory manager: 386max (default) or himem
 #   MAXBIN     386MAX.SYS and 386MAX.VXD (default ~/mars/Open386MAX/build/bin)
-#   WAV        test sound (default ~/mars/vsbvxd/build/test-win/T440.WAV)
+#   WAV        test sound (default build/test-win/T440.WAV, make -C test/win)
 #
 # Output (build/test-install/): serial.log, vxd.log, sound.wav, screen.png
 set -uo pipefail
@@ -23,7 +23,7 @@ OUT=$ROOT/build/test-install
 BASE=${WIN311IMG:?set WIN311IMG to a WfW 3.11 hard disk image}
 MM=${MM:-386max}
 MAXBIN=${MAXBIN:-$HOME/mars/Open386MAX/build/bin}
-WAV=${WAV:-$HOME/mars/vsbvxd/build/test-win/T440.WAV}
+WAV=${WAV:-$ROOT/build/test-win/T440.WAV}
 [ -f "$ROOT/build/pkg/INSTALL.EXE" ] || { echo "no build/pkg (install/mkpkg.sh)"; exit 1; }
 
 rm -rf "$OUT"; mkdir -p "$OUT/c/PKG" "$OUT/c/T" "$OUT/c/VSB"   # PLAYWAV writes C:\VSB\OUT.TXT

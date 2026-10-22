@@ -1,10 +1,13 @@
 # PLAYWAV.EXE, MIDITEST.EXE - Windows 3.1 test programs for VSBHDA.DRV
-# (Open Watcom)
+# (Open Watcom); T440.WAV, T880.WAV, SCALE.MID, SCALE13.MID (mksounds.py)
 WATCOM ?= /opt/watcom
 export WATCOM
 OUT ?= ../../build/test-win
 
-all: $(OUT)/PLAYWAV.EXE $(OUT)/MIDITEST.EXE
+all: $(OUT)/PLAYWAV.EXE $(OUT)/MIDITEST.EXE $(OUT)/T440.WAV
+
+$(OUT)/T440.WAV: mksounds.py | $(OUT)
+	python3 mksounds.py $(OUT)
 
 $(OUT):
 	mkdir -p $@
