@@ -1,0 +1,3 @@
+@ECHO OFF
+REM VSBHDA with 386MAX (QPI and DPMI built in)
+%VSBHDA%\VSBHDA.EXE %1 %2 %3 %4 %5 %6
