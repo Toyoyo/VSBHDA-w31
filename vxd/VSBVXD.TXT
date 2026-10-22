@@ -54,6 +54,13 @@
     VSBVXD needs no DOS components (no HDPMI, no Jemm/QPIEMU, no BLASTER
    variable for itself; DOS programs may need BLASTER set as usual).
 
+    A resident DOS VSBHDA keeps Windows from starting in enhanced mode;
+   VSBVXD unloads it in its real mode initialization (vxd/VSBRMI.ASM) the
+   way UNINST.EXE does: through VSBHDA's real mode port trapping (386MAX,
+   QEMM, Jemm+QPIEMU; not with VSBHDA /RM0). The SB port is taken from the
+   BLASTER variable (default 220h). After Windows, VSBHDA has to be started
+   again.
+
 
    3. Settings ([VSBVXD] in SYSTEM.INI)
 
