@@ -3,6 +3,53 @@ Sound blaster emulation for HDA (and AC97/SBLive); a fork of crazii's SBEMU: htt
 
 Works with unmodified HDPMI binaries, making it compatible with HX.
 
+## GeosOne fork
+
+This fork follows [Baron-von-Riedesel/VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA)
+and adds:
+
+ * **VSBVXD** (`vxd/`, `drv/`): VSBHDA for **Windows 3.1 enhanced mode**.
+   `VSBVXD.386` gives DOS boxes the Sound Blaster (SB, SB Pro, SB16, OPL3 at
+   388h); `VSBHDA.DRV` is the Windows wave, MIDI (OPL3 FM) and volume driver.
+   No DOS components are needed for it. When Windows starts, VSBVXD unloads a
+   resident DOS VSBHDA (with 386MAX, QEMM or Jemm+QPIEMU port trapping).
+   Details: [vxd/VSBVXD.TXT](vxd/VSBVXD.TXT).
+ * **CD audio**: digital CD audio through VSBHDA (`/CDA1`) with SHSUCDX's
+   CD audio API ([geosone/shsucd](https://github.com/geosone/shsucd)).
+ * A **setup package** for the [GeosOne Dual Installer](https://github.com/geosone/gdi)
+   (`install/`): it detects the memory manager (386MAX, QEMM, Jemm, HIMEM;
+   setup stops without one), starts VSBHDA from AUTOEXEC.BAT with what that
+   offers, installs the Windows part and sets up the MIDI Mapper.
+   `INSTALL /U` removes it again.
+ * Fixes: the sound card drivers (`*.DRV`) are loaded from the directory of
+   `VSBHDA.EXE`; HDA acknowledges the RIRB response interrupt status (a
+   driver loaded after VSBHDA got stuck in QEMU).
+
+**Download:** [Releases](https://github.com/geosone/VSBHDA/releases): the
+package as a ZIP and as a 1.44 MB disk image. Run `INSTALL.EXE` in DOS or
+Windows. Tested in QEMU so far (Windows for Workgroups 3.11, Intel HDA).
+
+| Memory manager | DOS games with sound | Windows 3.1 part |
+|---|---|---|
+| 386MAX | real mode and 32-bit protected mode | yes, VSBHDA is unloaded at Windows start |
+| QEMM | real mode and 32-bit protected mode (+ HDPMI32i) | yes, VSBHDA is unloaded at Windows start |
+| Jemm | real mode and 32-bit protected mode (+ QPIEMU, JHDPMI, HDPMI32i) | no (Jemm has no enhanced mode) |
+| HIMEM only | 32-bit protected mode only (HDPMI32i, `/RM0`) | yes, but VSBHDA is not started from AUTOEXEC.BAT |
+
+**Building the package** (Linux): `install/mkpkg.sh` builds VSBHDA, the
+drivers, VSBVXD and VSBHDA.DRV, fetches HDPMI32i/JHDPMI (HX 2.23) and
+JLOAD/QPIEMU (Jemm 5.86) from their releases (SHA-256 checked) and writes
+`build/pkg`, `build/vsbhda.zip` and `build/VSBHDA.IMG`. `VXDLINK` must name
+a JWlink with working `format windows vxd` (see vxd/VSBVXD.TXT); `GDI` names
+`INSTALL.EXE` (default `../gdi/build/INSTALL.EXE`).
+
+**Tests** (QEMU): `test/win311.sh` runs VSBVXD in Windows for Workgroups 3.11
+(`MM=386max` for 386MAX), `test/install.sh` installs the package, plays a
+tone in DOS and in Windows and removes it again. `make -C test/win` builds
+the Windows test programs and test sounds.
+
+## Upstream
+
 **Supported Sound hardware:**
  * CS4281 chip by Cirrus Logic
  * ES1370 chip by Ensoniq ( AudioPCI )
@@ -22,6 +69,7 @@ Fork VSBCMI (https://github.com/drivelling-spinel/VSBCMI/tree/main) also support
  * HDPMI32i - DPMI host with port trapping; 32-bit protected-mode
  * HDPMI16i - DPMI host with port trapping; 16-bit protected-mode
  * JEMM386/JEMMEX - V86 monitor with port trapping; v86-mode
+ * or instead of Jemm: QEMM (QPI port trapping), or 386MAX (QPI port trapping and DPMI host built in)
  
 VSBHDA uses source code from:
  * MPXPlay: https://mpxplay.sourceforge.net/ - sound hardware access
