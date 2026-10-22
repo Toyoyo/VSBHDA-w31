@@ -137,7 +137,7 @@ file $(OUTD)/CSTRTDHX.obj, $(OUTD)/MAIN.obj, $(OUTD)/LINEAR.obj \
 name $@ \
 libpath $(WATCOM)/lib386/dos:$(WATCOM)/lib386 \
 lib $(OUTD)/$(NAME).lib \
-op q,m=$(OUTD)/$(NAME).map,stub=res/LOADPERO.BIN,stack=0x10000,heap=0x1000 \
+op q,m=$(OUTD)/$(NAME).map,stub=RES/LOADPERO.BIN,stack=0x10000,heap=0x1000 \
 $(CONSTATTR) $(CONST2ATTR)
 
 $(OUTD16)/$(NAME)16.EXE:
