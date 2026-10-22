@@ -19,6 +19,8 @@
 #   TIMEOUT    seconds until the last screenshot (default 90)
 #   SHOTS      further screenshot times in seconds (space separated)
 #   (a program can write its results to C:\VSB\OUT.TXT, shown at the end)
+#   MM         memory manager: himem (default) or 386max (386MAX.SYS and
+#              386MAX.VXD from MAXBIN, default ~/mars/Open386MAX/build/bin)
 #   KEYS       QEMU sendkey commands (| separated) sent after TIMEOUT1 (60) s
 #
 # Output (build/test/): serial.log (AUX), vxd.log (VxD log, debug port E9h),
@@ -40,7 +42,15 @@ nasm -f bin -o "$OUT/c/QEXIT.COM" "$OUT/qexit.asm" || exit 1
 cp "$BASE" "$OUT/test.img"
 
 crlf() { tr '|' '\n' | sed 's/$/\r/'; }
-echo 'DEVICE=C:\HIMEM.SYS|DOS=HIGH|FILES=40|BUFFERS=20|SHELL=C:\COMMAND.COM C:\ /P' | crlf > "$OUT/c/CONFIG.SYS"
+case "${MM:-himem}" in
+himem)  MMLINE='DEVICE=C:\HIMEM.SYS|DOS=HIGH' ;;
+386max) MAXBIN=${MAXBIN:-$HOME/mars/Open386MAX/build/bin}
+        mkdir -p "$OUT/c/MAX"; cp "$MAXBIN/386MAX.SYS" "$MAXBIN/386MAX.VXD" "$OUT/c/MAX/"
+        printf '; 386MAX profile\r\n' > "$OUT/c/MAX/386MAX.PRO"
+        MMLINE='DEVICE=C:\MAX\386MAX.SYS PRO=C:\MAX\386MAX.PRO|DOS=HIGH,UMB' ;;
+*)      echo "unknown MM=$MM" >&2; exit 1 ;;
+esac
+echo "$MMLINE|FILES=40|BUFFERS=20|SHELL=C:\COMMAND.COM C:\ /P" | crlf > "$OUT/c/CONFIG.SYS"
 {
     echo '@ECHO OFF'
     echo 'PATH C:\;C:\WINDOWS;C:\VSB'
@@ -56,11 +66,13 @@ mcopy -o -s -i "$P" "$OUT"/c/* ::/ || exit 1
 mcopy -o -i "$P" ::/WINDOWS/SYSTEM.INI "$OUT/system.ini"
 [ -n "${DRV:-}" ] && mcopy -o -i "$P" "$DRV" ::/WINDOWS/SYSTEM/
 [ -n "${MIDIMAP:-}" ] && mcopy -o -i "$P" "$MIDIMAP" ::/WINDOWS/SYSTEM/MIDIMAP.CFG
-python3 - "$OUT/system.ini" "${INI:-}" "${DRV:+$(basename "${DRV:-}")}" <<'EOF'
+python3 - "$OUT/system.ini" "${INI:-}" "${DRV:+$(basename "${DRV:-}")}" "${MM:-himem}" <<'EOF'
 import sys
-f, ini, drv = sys.argv[1], sys.argv[2], sys.argv[3]
+f, ini, drv, mm = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 s = open(f, 'rb').read().decode('latin-1').replace('\r\n', '\n')
 s = s.replace('[386Enh]\n', '[386Enh]\ndevice=C:\\VSB\\VSBVXD.386\n', 1)
+if mm == '386max':
+    s = s.replace('[386Enh]\n', '[386Enh]\ndevice=C:\\MAX\\386MAX.VXD\n', 1)
 if drv:
     d = drv.lower()
     s = s.replace('[drivers]\n', '[drivers]\nwave=%s\nmidi=%s\naux=%s\n' % (d, d, d), 1)
