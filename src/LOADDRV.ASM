@@ -34,6 +34,7 @@ else
 externdef c _linear_rmstack:dword
 endif
 externdef c DSBase:dword
+externdef c DrvDir:byte
 
 ;--- structs
 
@@ -126,6 +127,7 @@ else
 endif
 
 params LDPARMS <>
+szDrvPath db 160 dup (?)	;the driver file in the directory of the program
 
 	.data
 
@@ -518,6 +520,25 @@ dyn_adetect proc c aui:ptr AUI
 	mov edx, aui
 	mov edx, [edx].AUI.card_info
 	mov edx, [edx].SNDCARD_INFO.shortname
+	push esi
+	push edi
+	mov edi, offset szDrvPath
+	mov esi, offset DrvDir
+@@:
+	lodsb
+	stosb
+	and al, al
+	jnz @B
+	dec edi
+	mov esi, edx
+@@:
+	lodsb
+	stosb
+	and al, al
+	jnz @B
+	pop edi
+	pop esi
+	mov edx, offset szDrvPath
 	@dprintf CStr("lddrv.adetect: loading %s driver, rmstack=%X",10), edx, _linear_rmstack
 	invoke _LoadDriver, edx
 	.if eax

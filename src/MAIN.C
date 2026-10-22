@@ -316,6 +316,8 @@ void MAIN_ReinitOPL( void )
 #define IsHexOption(x) (GOptions[x].pValue == &gvars.base )
 #endif
 
+char DrvDir[128]; /* directory of the program, for the *.DRV (LOADDRV.ASM) */
+
 int main(int argc, char* argv[])
 ////////////////////////////////
 {
@@ -326,6 +328,9 @@ int main(int argc, char* argv[])
     char* blaster = getenv("BLASTER");
 
     bOMode = IsDebuggerPresent() ? OM_DEBUGGER : OM_DOS;
+
+    if ( argc > 0 && ( p = strrchr( argv[0], '\\' ) ) && (char *)p - argv[0] < sizeof( DrvDir ) - 1 )
+        memcpy( DrvDir, argv[0], (char *)p - argv[0] + 1 );
 
     if(blaster != NULL) {
         while (*blaster) {
