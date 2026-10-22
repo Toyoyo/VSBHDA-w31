@@ -14,8 +14,8 @@ and adds:
    No DOS components are needed for it. When Windows starts, VSBVXD unloads a
    resident DOS VSBHDA (with 386MAX, QEMM or Jemm+QPIEMU port trapping).
    Details: [vxd/VSBVXD.TXT](vxd/VSBVXD.TXT).
- * **CD audio**: digital CD audio through VSBHDA (`/CDA1`) with SHSUCDX's
-   CD audio API ([geosone/shsucd](https://github.com/geosone/shsucd)).
+ * **CD audio**: digital CD audio through VSBHDA (`/CDA1`) with the
+   modified SHSUCDX, see [CD audio with SHSUCDX](#cd-audio-with-shsucdx).
  * A **setup package** for the [GeosOne Dual Installer](https://github.com/geosone/gdi)
    (`install/`): it detects the memory manager (386MAX, QEMM, Jemm, HIMEM;
    setup stops without one), starts VSBHDA from AUTOEXEC.BAT with what that
@@ -35,6 +35,37 @@ Windows. Tested in QEMU so far (Windows for Workgroups 3.11, Intel HDA).
 | QEMM | real mode and 32-bit protected mode (+ HDPMI32i) | yes, VSBHDA is unloaded at Windows start |
 | Jemm | real mode and 32-bit protected mode (+ QPIEMU, JHDPMI, HDPMI32i) | no (Jemm has no enhanced mode) |
 | HIMEM only | 32-bit protected mode only (HDPMI32i, `/RM0`) | yes, but VSBHDA is not started from AUTOEXEC.BAT |
+
+### CD audio with SHSUCDX
+
+Many CD-ROM games play their music as audio tracks. Today's drives often
+have no analog audio cable to the sound card (SATA, USB, virtual drives),
+so VSBHDA can play them digitally: with `/CDA1` it reads the audio sectors
+and mixes them into its output (`/CV0`-`/CV9`: CD volume, default 7).
+
+This needs **SHSUCDX with CD audio support**,
+[geosone/shsucd](https://github.com/geosone/shsucd): SHSUCD 3.09 of Jason
+Hood with the CD audio patch of PCGamingTimeMachine (audio reads from the
+drive or from a CD image in XMS) and the GeosOne changes:
+
+ * `SHSUCDX /A:ON`: PLAY, STOP and RESUME of the games go to VSBHDA (digital)
+ * `SHSUCDX /A:OFF`: the drive plays (analog cable), as without the patch
+ * `SHSUCDX /A:AUTO`: digital while VSBHDA is loaded, else analog
+ * `CDAUDIO [ON | OFF | AUTO]` (`CDAUDIO.COM`): shows or switches the mode
+   at run time
+ * API: INT 2Fh AX=15FFh BX=CDDAh (CX=0 register the player, 1 status,
+   2 set mode, 3 unregister); VSBHDA unregisters itself when it is unloaded
+
+Any CD-ROM driver works below SHSUCDX, also `ASPICDA.SYS` of
+[OpenASPI](https://github.com/geosone/OpenASPI) (AHCI and USB drives through
+AHCIASPI/EUSBASPI); its build writes `SHSUCDX.COM` and `CDAUDIO.COM`
+(`deps/shsucd`). The setup package offers the CD audio option when it finds
+SHSUCDX with CD audio loaded (`VSBCHK /CDA`) and then starts VSBHDA with
+`/CDA1`. MSCDEX and the original SHSUCDX don't have the API: there the
+drive plays as before.
+
+In Windows 3.1, VSBVXD has no digital CD audio: the MCI CD audio driver
+lets the drive play.
 
 **Building the package** (Linux): `install/mkpkg.sh` builds VSBHDA, the
 drivers, VSBVXD and VSBHDA.DRV, fetches HDPMI32i/JHDPMI (HX 2.23) and
