@@ -326,8 +326,11 @@ static unsigned int azx_reset(struct intelhd_card_s *chip)
 	chip->hdac->rirbwp = (uint16_t)0x8000; /* reset RIRB write pointer */
 	//chip->hdac->rirbsize = 0; /* RIRB size ( 0=2,1=16,2=256,3=rsvd ) */
 	/* set no of responses until interrupt is generated (0=256 interrupts);
-	 * since bit RINTCTL isn't set, interrupts aren't necessary */
-	chip->hdac->rirbric = 64;
+	 * the response interrupt status is acknowledged by hda_codec_write().
+	 * QEMU stops the CORB when its response count reaches this value, until
+	 * that status is cleared - and keeps the count across a controller reset.
+	 * A previous driver without RINTCTL may have left the count at 64. */
+	chip->hdac->rirbric = 255;
 
 	pds_delay_10us(100);
 
@@ -388,6 +391,10 @@ static int hda_codec_write(struct intelhd_card_s *chip, hda_nid_t nid, unsigned 
 	int        corbindex;  /* current CORB write pointer */
 	uint8_t    corbrp = chip->hdac->corbrp & 0xFF;
 
+	/* acknowledge the response interrupt status (RINTCNT reached) */
+	if ( chip->hdac->rirbsts & 1 )
+		chip->hdac->rirbsts = 1;
+
 	val  = (uint32_t)(chip->codec_index & 0x0f) << 28;
 	//val |= (uint32_t)direct << 27;
 	val |= (uint32_t)nid << 20;
@@ -398,7 +405,7 @@ static int hda_codec_write(struct intelhd_card_s *chip, hda_nid_t nid, unsigned 
 	chip->corb_buffer[corbindex] = val;
 	chip->hdac->corbwp = corbindex; /* update buffer pointer */
 	/* wait till cmd has been sent */
-	for ( timeout = 2000; timeout && (corbrp == chip->hdac->corbrp & 0xFF ); timeout--, pds_delay_10us(100) );
+	for ( timeout = 2000; timeout && (corbrp == (chip->hdac->corbrp & 0xFF) ); timeout--, pds_delay_10us(100) );
 #ifdef _DEBUG
 	if (!timeout) dbgprintf(("hda_codec_write: timeout error!\n"));
 #endif
@@ -1006,6 +1013,7 @@ static void hda_hw_close(struct intelhd_card_s *card)
 	/* stop CORB & RIRB DMA engines */
 	card->hdac->corbctl = 0;
 	card->hdac->rirbctl = 0;
+	card->hdac->rirbsts = RIRB_INT_MASK; /* leaves QEMU's response count at 0 */
 	card->hdac->intsts = 0; /* useful? this register is RO! */
 
 	/* done in hda_hw_init() */
@@ -1422,7 +1430,7 @@ static int HDA_adetect( struct audioout_info_s *aui )
 
 		/* hda_mixer_init talks to codec; means CORB/RIRB must be ready to use */
 		card->hdac->corbctl = 2; /* start CORB DMA engine */
-		card->hdac->rirbctl = 2; /* start RIRB DMA engine */
+		card->hdac->rirbctl = 2 | 1; /* start RIRB DMA engine, RINTCTL (see azx_reset) */
 		/* wait till engines are up */
 		for ( timeout = 0; timeout < 100 && !(card->hdac->corbctl & 2); timeout++, pds_delay_10us(100) );
 
