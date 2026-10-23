@@ -343,6 +343,7 @@ endif
 	ret
 
 if 1
+
 nomem:
 nodesc:
 	mov ax, 109
@@ -359,10 +360,12 @@ err_with_close:
 	pop eax
 open_err:
 	@dprintf CStr("LoadDriver failed, ax=%X",10), ax
-	mov edx, eax
-	xor eax, eax
+	movzx eax,ax
+	neg eax
 	ret
+
 else
+
 	.const
 
 errstr1 db "open error",13,10,'$'
@@ -391,7 +394,7 @@ nomem:
 	jmp err_with_close
 fmt_err:
 	push offset errstr5
-errexit2:
+err_with_close:
 	push eax
 	mov bx, wFile
 	mov ah, 3Eh
@@ -523,6 +526,18 @@ dyn_adetect proc c aui:ptr AUI
 	push esi
 	push edi
 	mov edi, offset szDrvPath
+;--- a name with a path ( option /DF: ) is used as is
+	mov esi, edx
+@@:
+	lodsb
+	cmp al, ':'
+	jz nodir
+	cmp al, '\'
+	jz nodir
+	cmp al, '/'
+	jz nodir
+	and al, al
+	jnz @B
 	mov esi, offset DrvDir
 @@:
 	lodsb
@@ -530,6 +545,7 @@ dyn_adetect proc c aui:ptr AUI
 	and al, al
 	jnz @B
 	dec edi
+nodir:
 	mov esi, edx
 @@:
 	lodsb
@@ -541,8 +557,7 @@ dyn_adetect proc c aui:ptr AUI
 	mov edx, offset szDrvPath
 	@dprintf CStr("lddrv.adetect: loading %s driver, rmstack=%X",10), edx, _linear_rmstack
 	invoke _LoadDriver, edx
-	.if eax
-int 3
+	.if sdword ptr eax > 0
 		@dprintf CStr("lddrv.adetect: calling LibMain()",10)
 		push ds
 		push es
@@ -601,10 +616,12 @@ endif
 				mov ebx, offset my_Mixerdata
 				call translate_mixerarray
 @@:
-;--- translate the DMA buffer pointer - it has been set by the driver, but isn't used by it
-				mov edx, [esi].AUI.card_pDmaBuffer
-				Rebase2Intern edx
-				mov [esi].AUI.card_pDmaBuffer, edx
+;--- translate the DMA buffer pointer - if it has been set by the driver
+				mov ecx, [esi].AUI.card_pDmaBuffer
+				jecxz @F
+				Rebase2Intern ecx
+				mov [esi].AUI.card_pDmaBuffer, ecx
+@@:
 				pop esi
 				pop ebx
 			.endif

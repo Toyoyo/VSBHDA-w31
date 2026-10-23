@@ -88,7 +88,7 @@ LIBS=
 	@$(ASM) -q -DDPMI16 -Isrc\startup -D?MODEL=small $(A_DEBUG_FLAGS) -Fo$@ $<
 
 {src}.c{$(OUTD)}.obj
-	@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) -os $(C_EXTRA_FLAGS) $(CFLAGS) -Isrc $(INCLUDES) -fo=$@ $<
+	@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) -os $(C_EXTRA_FLAGS) -Isrc $(INCLUDES) -fo=$@ $<
 
 {src}.cpp{$(OUTD)}.obj
 	@$(CPP) $(C_DEBUG_FLAGS) $(CPP_OPT_FLAGS) -os $(C_EXTRA_FLAGS) $(CPPFLAGS) -Isrc $(INCLUDES) -fo=$@ $<
@@ -97,7 +97,7 @@ LIBS=
 	@$(ASM) -q -zcw -D?MODEL=small $(OW19) $(A_DEBUG_FLAGS) -Fo$@ $<
 
 #{src\startup}.c{$(OUTD)}.obj
-#	@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) $(INCLUDES) -fo=$@ $<
+#	@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(INCLUDES) -fo=$@ $<
 
 all: $(OUTD) $(OUTD)\$(NAME).EXE
 
@@ -119,7 +119,6 @@ $(OUTD)\$(NAME).lib: $(OBJFILES)
 
 $(OUTD)/adpcm.obj:     src\adpcm.c
 $(OUTD)/au_cards.obj:  src\au_cards.c
-	@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) -os $(C_EXTRA_FLAGS) $(CFLAGS) -Isrc $(INCLUDES) -fo=$@ $<
 $(OUTD)/dpmi.obj:      src\dpmi.asm
 $(OUTD)/dpmiisr.obj:   src\dpmiisr.asm
 $(OUTD)/fileacc.obj:   src\fileacc.asm
