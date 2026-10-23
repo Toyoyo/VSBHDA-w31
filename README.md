@@ -44,9 +44,11 @@ so VSBHDA can play them digitally: with `/CDA1` it reads the audio sectors
 and mixes them into its output (`/CV0`-`/CV9`: CD volume, default 7).
 
 This needs **SHSUCDX with CD audio support**,
-[geosone/shsucd](https://github.com/geosone/shsucd): SHSUCD 3.09 of Jason
-Hood with the CD audio patch of PCGamingTimeMachine (audio reads from the
-drive or from a CD image in XMS) and the GeosOne changes:
+[geosone/shsucd](https://github.com/geosone/shsucd) (SHSUCDX 4.00, release
+[4.00-g1](https://github.com/geosone/shsucd/releases/tag/v4.00-g1) with a
+setup that puts SHSUCDX in the place of MSCDEX or NWCDEX): the SHSUCD suite
+of Jason Hood with the CD audio patch of PCGamingTimeMachine (audio reads
+from the drive or from a CD image in XMS) and the GeosOne changes:
 
  * `SHSUCDX /A:ON`: PLAY, STOP and RESUME of the games go to VSBHDA (digital)
  * `SHSUCDX /A:OFF`: the drive plays (analog cable), as without the patch
@@ -57,9 +59,10 @@ drive or from a CD image in XMS) and the GeosOne changes:
    2 set mode, 3 unregister); VSBHDA unregisters itself when it is unloaded
 
 Any CD-ROM driver works below SHSUCDX, also `ASPICDA.SYS` of
-[OpenASPI](https://github.com/geosone/OpenASPI) (AHCI and USB drives through
-AHCIASPI/EUSBASPI); its build writes `SHSUCDX.COM` and `CDAUDIO.COM`
-(`deps/shsucd`). The setup package offers the CD audio option when it finds
+[OpenASPI](https://github.com/geosone/OpenASPI) for AHCI and USB drives:
+[AHCIASPI](https://github.com/geosone/ahciaspi) and
+[EUSBASPI](https://github.com/geosone/eusbaspi) 0.4 install it together with
+SHSUCDX and `CDAUDIO.COM`. The setup package offers the CD audio option when it finds
 SHSUCDX with CD audio loaded (`VSBCHK /CDA`) and then starts VSBHDA with
 `/CDA1`. MSCDEX and the original SHSUCDX don't have the API: there the
 drive plays as before.
