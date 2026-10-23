@@ -14,7 +14,9 @@ and adds:
    No DOS components are needed for it. When Windows starts, VSBVXD unloads a
    resident DOS VSBHDA (with 386MAX, QEMM or Jemm+QPIEMU port trapping).
    Details: [vxd/VSBVXD.TXT](vxd/VSBVXD.TXT).
- * **CD audio**: digital CD audio through VSBHDA (`/CDA1`) with the
+ * **CD audio** by PCGamingTimeMachine
+   ([VSBHDARB](https://github.com/PCGamingTimeMachine/VSBHDARB)), ported to
+   the current VSBHDA: digital CD audio through VSBHDA (`/CDA1`) with the
    modified SHSUCDX, see [CD audio with SHSUCDX](#cd-audio-with-shsucdx).
  * A **setup package** for the [GeosOne Dual Installer](https://github.com/geosone/gdi)
    (`install/`): it detects the memory manager (386MAX, QEMM, Jemm, HIMEM;
